@@ -2,91 +2,100 @@
 
 ## Project Overview
 
-**Project Name:** Cartwise
+**Project Name:** Berry Buddy
 **Version:** 1.0
 **Status:** Draft
 **Last Updated:** 2026-10-28
 
 ## Introduction
 
-Cartwise is a modern e-commerce platform designed to provide users with a seamless shopping experience. The platform will feature real-time inventory management, secure payment processing, and an intuitive user interface.
+Berry Buddy is a mobile-first Progressive Web Application (PWA) designed to help users search, discover, and compare products based on personalized user priorities. The app focuses on empowering users to make informed decisions by providing detailed product information, nutrition facts, ingredients, and intelligent comparison tools.
 
 ## Objectives
 
 ### Primary Goals
 
-1. Provide a user-friendly shopping experience
-2. Enable secure and efficient payment processing
-3. Support real-time inventory management
-4. Implement robust user authentication and authorization
-5. Ensure high performance and scalability
+1. Enable users to search and discover products by name
+2. Provide comprehensive product information including nutrition facts and ingredients
+3. Help users discover comparable alternatives to products
+4. Allow users to apply personalized priorities (0–10 rating and tie-breaker ranking)
+5. Facilitate side-by-side product comparisons with visual strength indicators
+6. Enable users to save/star favorite products for quick access
 
 ### Success Metrics
 
 - User engagement and retention rates
-- Conversion rate optimization
-- System uptime and performance
-- Customer satisfaction scores
-
-## Target Audience
-
-- Individual consumers looking for a convenient shopping experience
-- Small to medium-sized businesses for B2C transactions
-- Price-conscious shoppers seeking competitive deals
+- Search success rate and relevance
+- Comparison tool usage frequency
+- Saved product count per user
+- User satisfaction scores
 
 ## Functional Requirements
 
-### User Features
+### In-Scope Features
 
-#### Authentication & Authorization
-- User registration and login
-- Password recovery
-- OAuth integration (Google, GitHub)
-- Profile management
+#### Product Search & Discovery
+- Search products by name with real-time suggestions
+- View detailed product information including:
+  - Nutrition facts (calories, macronutrients, micronutrients)
+  - Full ingredient list
+  - Product images
+  - Brand and category information
+- Discover comparable alternatives based on:
+  - Similar nutritional profiles
+  - Ingredient similarity
+  - Category matching
 
-#### Product Management
-- Product browsing and search
-- Product filtering and sorting
-- Product details and reviews
-- Inventory availability display
+#### Personalized Priorities
+- Create and manage custom priority categories (e.g., "Low Sugar", "High Protein", "Organic")
+- Assign 0–10 rating to each priority category
+- Set tie-breaker ranking order for priorities
+- Apply priorities to product searches and comparisons
+- Save priority configurations for future use
 
-#### Shopping Cart
-- Add/remove items
-- Quantity adjustment
-- Price calculation
-- Persistent cart storage
+#### Product Comparison
+- Side-by-side comparison table for multiple products
+- Green highlight indicators for product strengths based on user priorities
+- Visual comparison of:
+  - Nutritional values
+  - Ingredient lists
+  - Priority scores
+  - Price (if available)
+- Quick add/remove products from comparison
+- Share comparison results
 
-#### Checkout & Payment
-- Multiple payment methods (credit card, PayPal, etc.)
-- Shipping address management
-- Order confirmation
-- Order history
+#### Saved Products
+- Star/save favorite products for quick access
+- Organize saved products into custom lists
+- Quick access to saved products from dashboard
+- Sync saved products across devices
 
-#### Account Management
-- Order tracking
-- Wishlists
-- Payment method management
-- Shipping preferences
+#### User Account (Optional)
+- Anonymous usage supported
+- Optional account creation for data persistence
+- Save priority configurations across sessions
+- Sync saved products across devices
 
-### Admin Features
+### Explicitly Out-of-Scope
 
-#### Dashboard
-- Sales analytics
-- Inventory overview
-- User management
+#### Store-Based Features
+- Store-specific price comparison
+- Store availability or inventory tracking
+- Store location and hours
+- In-store product mapping
+
+#### Price-Related Features
+- Real-time price tracking
+- Price alerts and notifications
+- Discount and coupon management
+- Price history charts
+
+#### E-Commerce Features
+- Shopping cart functionality
+- Checkout and payment processing
 - Order management
-
-#### Product Management
-- Add/edit/delete products
-- Bulk product uploads
-- Inventory updates
-- Category management
-
-#### Order Management
-- Order fulfillment
-- Shipping management
-- Returns and refunds
-- Customer communication
+- Shipping and delivery
+- Order history and tracking
 
 ## Non-Functional Requirements
 
@@ -97,9 +106,10 @@ Cartwise is a modern e-commerce platform designed to provide users with a seamle
 
 ### Security
 - HTTPS/TLS encryption
-- PCI DSS compliance for payments
-- Secure authentication (JWT, OAuth)
+- Secure authentication (JWT, OAuth) for optional accounts
 - Data encryption at rest
+- API rate limiting
+- Input validation and sanitization
 
 ### Scalability
 - Horizontal scaling capability
@@ -114,27 +124,33 @@ Cartwise is a modern e-commerce platform designed to provide users with a seamle
 ## Technical Stack
 
 ### Frontend
-- Framework: TBD (React, Vue, Next.js)
-- State Management: TBD
-- UI Components: TBD
+- Framework: React
+- Build Tool: Vite
+- Application Type: Progressive Web Application (PWA)
+- State Management: React Context API / Redux (as needed)
+- UI Components: Material UI or Tailwind CSS
+- PWA Features: Service Worker, Offline Support, Installable
 
 ### Backend
 - Runtime: Node.js
-- Framework: TBD (Express, Fastify)
-- API: REST/GraphQL
+- Framework: Express
+- API Type: REST
+- Authentication: JWT (optional, for account features)
 
 ### Database
 - Primary: Supabase (PostgreSQL)
-- Caching: TBD (Redis)
+- ORM: Prisma or Supabase Client
+- Features: Real-time subscriptions, Row-level security
 
 ### Infrastructure
-- Hosting: TBD (Vercel, AWS, GCP)
-- CI/CD: TBD (GitHub Actions)
-- Monitoring: TBD
+- Frontend Hosting: Vercel or Netlify
+- Backend Hosting: Render, Railway, or Vercel Functions
+- CI/CD: GitHub Actions
+- Monitoring: TBD (Sentry for errors, Analytics for usage)
 
 ## API Requirements
 
-### Authentication Endpoints
+### Authentication Endpoints (Optional)
 - POST /api/auth/register
 - POST /api/auth/login
 - POST /api/auth/logout
@@ -142,61 +158,86 @@ Cartwise is a modern e-commerce platform designed to provide users with a seamle
 - POST /api/auth/reset-password
 
 ### Product Endpoints
-- GET /api/products
-- GET /api/products/:id
-- POST /api/products (admin)
-- PUT /api/products/:id (admin)
-- DELETE /api/products/:id (admin)
+- GET /api/products - Search products by name
+- GET /api/products/:id - Get product details with nutrition and ingredients
+- GET /api/products/:id/alternatives - Get comparable alternatives
+- GET /api/products/similar - Find similar products based on parameters
 
-### Cart Endpoints
-- GET /api/cart
-- POST /api/cart/items
-- PUT /api/cart/items/:id
-- DELETE /api/cart/items/:id
+### Priority Endpoints
+- GET /api/priorities - Get user's priority configurations
+- POST /api/priorities - Create new priority configuration
+- PUT /api/priorities/:id - Update priority configuration
+- DELETE /api/priorities/:id - Delete priority configuration
 
-### Order Endpoints
-- POST /api/orders
-- GET /api/orders
-- GET /api/orders/:id
-- PUT /api/orders/:id/status (admin)
+### Comparison Endpoints
+- POST /api/compare - Compare multiple products with priorities applied
+- GET /api/compare/:sessionId - Retrieve previous comparison
+
+### Saved Products Endpoints
+- GET /api/saved - Get user's saved products
+- POST /api/saved - Add product to saved list
+- DELETE /api/saved/:productId - Remove product from saved list
+- GET /api/saved/lists - Get custom saved product lists
+- POST /api/saved/lists - Create custom list
+- PUT /api/saved/lists/:id - Update custom list
+- DELETE /api/saved/lists/:id - Delete custom list
+
+### Admin Endpoints (For Product Data Management)
+- POST /api/products (admin) - Add new product
+- PUT /api/products/:id (admin) - Update product
+- DELETE /api/products/:id (admin) - Delete product
+- POST /api/products/bulk (admin) - Bulk upload products
 
 ## User Interface Requirements
 
 ### Design Principles
-- Mobile-first responsive design
+- Mobile-first responsive design (PWA-optimized)
 - Accessibility compliance (WCAG 2.1 AA)
 - Consistent branding and visual identity
 - Intuitive navigation
+- Fast loading and offline support
+- Touch-friendly interface
 
 ### Key Screens
-- Homepage with featured products
-- Product listing and search
-- Product detail page
-- Shopping cart
-- Checkout flow
-- User account dashboard
-- Admin dashboard
+- **Search Screen**: Search bar with real-time suggestions, recent searches
+- **Product Detail Screen**: Nutrition facts, ingredients, images, alternative suggestions
+- **Comparison Screen**: Side-by-side comparison table with green highlights for strengths
+- **Priorities Configuration Screen**: 0–10 rating sliders, tie-breaker drag-and-drop ordering
+- **Saved Products Screen**: Starred products, custom lists organization
+- **Dashboard Screen**: Quick access to search, saved products, and priorities
+- **Admin Dashboard** (internal): Product data management, bulk uploads
 
 ## Data Requirements
 
-### User Data
+### User Data (Optional)
 - Personal information (name, email)
-- Shipping addresses
-- Payment methods (tokenized)
-- Order history
+- Priority configurations
+- Saved products
+- Custom product lists
+- Recent searches
 
 ### Product Data
-- Name, description, SKU
-- Price, discounts
-- Inventory levels
-- Categories, tags
-- Images and media
+- Name, brand, description
+- Nutrition facts (calories, protein, carbs, fat, fiber, sugar, sodium, vitamins, minerals)
+- Full ingredient list
+- Category and subcategory
+- Product images
+- Serving size information
+- Barcode/UPC (if available)
+- Tags (organic, gluten-free, vegan, etc.)
 
-### Order Data
-- Order items and quantities
-- Shipping information
-- Payment status
-- Order status and timestamps
+### Priority Configuration Data
+- Priority category name
+- Rating (0–10)
+- Tie-breaker rank
+- Associated nutrition/ingredient criteria
+- User association
+
+### Comparison Data
+- Product IDs being compared
+- Applied priority configuration
+- Computed scores
+- Timestamp
 
 ## Compliance & Legal
 
@@ -209,40 +250,56 @@ Cartwise is a modern e-commerce platform designed to provide users with a seamle
 ## Future Enhancements
 
 ### Phase 2 Features
-- Product recommendations
-- Advanced search filters
-- Social sharing
-- Customer reviews and ratings
-- Live chat support
+- Barcode scanning for quick product lookup
+- Product recommendations based on saved items
+- Advanced search filters (dietary restrictions, allergens)
+- Social sharing of comparisons
+- User-submitted reviews and ratings
+- Integration with nutrition APIs for automatic data import
 
 ### Phase 3 Features
-- Mobile applications (iOS, Android)
-- Multi-vendor marketplace
-- Subscription services
-- Loyalty program
-- International shipping
+- Native mobile applications (iOS, Android)
+- Store integration for local inventory
+- Price comparison from multiple retailers
+- Meal planning and recipe integration
+- Community features and forums
+- Advanced analytics dashboard
 
 ## Risks & Mitigation
 
 ### Technical Risks
 - Platform downtime mitigation
 - Data backup and recovery
-- DDoS protection
+- PWA compatibility across devices
+- Product data accuracy and completeness
 
 ### Business Risks
-- Market competition analysis
-- User acquisition strategy
-- Payment gateway reliability
+- Market competition from nutrition apps
+- User acquisition and retention
+- Product data sourcing and maintenance
+- Data provider partnerships
 
 ## Timeline
 
 ### MVP Release
 - **Target:** Q1 2027
-- **Scope:** Core shopping features, basic admin panel
+- **Scope:**
+  - Product search and discovery
+  - Nutrition facts and ingredients display
+  - Basic alternative product suggestions
+  - Simple priority configuration
+  - Side-by-side comparison
+  - Save/star products
 
 ### Version 1.0
 - **Target:** Q2 2027
-- **Scope:** Full feature set, optimized performance
+- **Scope:**
+  - Advanced priority customization
+  - Enhanced comparison algorithms
+  - Offline PWA functionality
+  - User accounts and data sync
+  - Custom saved product lists
+  - Optimized performance
 
 ## Approval
 

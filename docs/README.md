@@ -1,17 +1,17 @@
-# Cartwise
+# Berry Buddy
 
-A modern e-commerce platform built with cutting-edge technologies.
+A mobile-first Progressive Web Application (PWA) for searching, discovering, and comparing products based on personalized user priorities.
 
 ## Overview
 
-Cartwise is a full-stack e-commerce application designed to provide a seamless shopping experience with real-time inventory management, secure payment processing, and intuitive user interface.
+Berry Buddy helps users make informed product decisions by providing detailed nutrition facts, ingredient lists, and intelligent comparison tools. Users can set personalized priorities (0–10 rating with tie-breaker ranking) to quickly identify products that best match their needs.
 
 ## Project Structure
 
 ```
-Cartwise/
-├── client/          # Frontend application
-├── api/            # Backend API services
+Berry Buddy/
+├── client/          # React PWA frontend
+├── api/            # Node.js/Express REST API
 ├── supabase/       # Supabase configuration and migrations
 ├── docs/           # Project documentation
 └── .gitignore      # Git ignore rules
