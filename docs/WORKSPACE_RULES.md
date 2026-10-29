@@ -2,11 +2,11 @@
 
 ## Project Overview
 
-**Project:** Berry Buddy
+**Project:** Cartwise
 **Type:** Mobile-first Progressive Web Application (PWA)
 **Tech Stack:** React (Vite), Node.js/Express, Supabase (PostgreSQL)
 
-This document defines the team's workflow, coding standards, and best practices for the Berry Buddy project.
+This document defines the team's workflow, coding standards, and best practices for the Cartwise project.
 
 ## Project Standards
 

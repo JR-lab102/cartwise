@@ -1,15 +1,15 @@
-# Berry Buddy
+# Cartwise
 
 A mobile-first Progressive Web Application (PWA) for searching, discovering, and comparing products based on personalized user priorities.
 
 ## Overview
 
-Berry Buddy helps users make informed product decisions by providing detailed nutrition facts, ingredient lists, and intelligent comparison tools. Users can set personalized priorities (0–10 rating with tie-breaker ranking) to quickly identify products that best match their needs.
+Cartwise helps users make informed product decisions by providing detailed nutrition facts, ingredient lists, and intelligent comparison tools. Users can set personalized priorities (0–10 rating with tie-breaker ranking) to quickly identify products that best match their needs.
 
 ## Project Structure
 
 ```
-Berry Buddy/
+Cartwise/
 ├── client/          # React PWA frontend
 ├── api/            # Node.js/Express REST API
 ├── supabase/       # Supabase configuration and migrations

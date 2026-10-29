@@ -1,10 +1,10 @@
-# Berry Buddy
+# Cartwise
 
 A mobile-first Progressive Web Application (PWA) for searching, discovering, and comparing products based on personalized user priorities.
 
 ## Description
 
-Berry Buddy empowers users to make informed product decisions by providing detailed nutrition facts, ingredient lists, and intelligent comparison tools. Users can set personalized priorities (0–10 rating with tie-breaker ranking) to quickly identify products that best match their health and dietary needs.
+Cartwise empowers users to make informed product decisions by providing detailed nutrition facts, ingredient lists, and intelligent comparison tools. Users can set personalized priorities (0–10 rating with tie-breaker ranking) to quickly identify products that best match their health and dietary needs.
 
 ### Key Features
 
@@ -29,7 +29,7 @@ Berry Buddy empowers users to make informed product decisions by providing detai
 1. **Clone the repository**
    ```bash
    git clone https://github.com/JR-lab102/cartwise.git
-   cd cartwise
+   cd Cartwise
    ```
 
 2. **Install dependencies**
@@ -87,7 +87,7 @@ Berry Buddy empowers users to make informed product decisions by providing detai
 ## Project Structure
 
 ```
-Berry Buddy/
+Cartwise/
 ├── client/              # React PWA frontend application
 │   ├── src/            # Source code
 │   ├── public/         # Static assets

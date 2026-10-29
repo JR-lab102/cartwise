@@ -2,14 +2,14 @@
 
 ## Project Overview
 
-**Project Name:** Berry Buddy
+**Project Name:** Cartwise
 **Version:** 1.0
 **Status:** Draft
 **Last Updated:** 2026-10-28
 
 ## Introduction
 
-Berry Buddy is a mobile-first Progressive Web Application (PWA) designed to help users search, discover, and compare products based on personalized user priorities. The app focuses on empowering users to make informed decisions by providing detailed product information, nutrition facts, ingredients, and intelligent comparison tools.
+Cartwise is a mobile-first Progressive Web Application (PWA) designed to help users search, discover, and compare products based on personalized user priorities. The app focuses on empowering users to make informed decisions by providing detailed product information, nutrition facts, ingredients, and intelligent comparison tools.
 
 ## Objectives
 
