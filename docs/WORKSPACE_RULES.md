@@ -1,5 +1,13 @@
 # Workspace Rules
 
+## Project Overview
+
+**Project:** Berry Buddy
+**Type:** Mobile-first Progressive Web Application (PWA)
+**Tech Stack:** React (Vite), Node.js/Express, Supabase (PostgreSQL)
+
+This document defines the team's workflow, coding standards, and best practices for the Berry Buddy project.
+
 ## Project Standards
 
 ### Code Style
@@ -28,30 +36,83 @@
 
 ### Git Workflow
 
-#### Branch Naming
-- `feature/` - New features
-- `bugfix/` - Bug fixes
-- `hotfix/` - Critical production fixes
-- `refactor/` - Code refactoring
-- `docs/` - Documentation updates
-- `test/` - Test additions/updates
+#### Branching Strategy
 
-#### Commit Messages
-- Use conventional commits format
+**Branch Types:**
+- `main` - Stable/production branch. Only production-ready code is merged here.
+- `develop` - Integration branch. All feature branches are merged here for testing and integration.
+- `feature/<feature-name>` - Individual feature branches created from `develop` for specific tasks.
+
+**Branch Workflow:**
+1. Create `feature/<feature-name>` from `develop` branch
+2. Develop and test the feature on the feature branch
+3. Create a pull request from `feature/<feature-name>` to `develop`
+4. After review and approval, merge to `develop`
+5. Once features are tested and stable on `develop`, merge to `main` for production
+
+**Branch Rules:**
+- Never commit directly to `main` or `develop`
+- Always create feature branches for development
+- Keep feature branches focused on a single feature or fix
+- Delete feature branches after merging
+- Use descriptive branch names (e.g., `feature/product-search`, `feature/priority-configuration`)
+
+#### Commit Message Format
+
+**Conventional Commits:**
 - Format: `type(scope): description`
-- Types: feat, fix, docs, style, refactor, test, chore
-- Examples:
-  - `feat(auth): add OAuth login`
-  - `fix(cart): resolve item removal bug`
-  - `docs(readme): update installation guide`
+- **Types:**
+  - `feat:` - New feature
+  - `fix:` - Bug fix
+  - `docs:` - Documentation changes
+  - `chore:` - Maintenance tasks, build process, dependency updates
+  - `style:` - Code style changes (formatting, no logic change)
+  - `refactor:` - Code refactoring (no functional change)
+  - `test:` - Test additions or updates
 
-#### Pull Request Guidelines
-- Create PRs from feature branches to main
-- Include clear description of changes
-- Reference related issues
-- Ensure all tests pass
-- Request at least one code review
-- Keep PRs focused and small
+**Examples:**
+- `feat(search): implement real-time search suggestions`
+- `fix(comparison): resolve green highlighting bug`
+- `docs(readme): update installation guide`
+- `chore(deps): upgrade React to v18`
+- `style(priorities): format with Prettier`
+- `refactor(api): extract duplicate validation logic`
+- `test(comparison): add unit tests for scoring algorithm`
+
+**Guidelines:**
+- Use lowercase for type
+- Keep description under 72 characters
+- Use imperative mood ("add" not "added")
+- Add body for detailed explanations if needed
+- Reference issue numbers if applicable
+
+#### Pull Request Process
+
+**PR Requirements:**
+- All feature branches require a pull request before merging
+- PR must be created from `feature/<feature-name>` to `develop`
+- At least 1 team member review required before approval
+- All automated tests must pass
+- Code must pass linting checks
+- PR description must include:
+  - Clear summary of changes
+  - Related issue or task number
+  - Testing performed
+  - Screenshots for UI changes (if applicable)
+
+**PR Review Guidelines:**
+- Be constructive and respectful in feedback
+- Focus on code quality, correctness, and maintainability
+- Ask questions for clarification
+- Suggest improvements when appropriate
+- Approve only when confident in the changes
+- Request changes if significant issues found
+
+**PR Merging:**
+- Use "Squash and merge" to keep history clean
+- Delete feature branch after merging
+- Ensure commit message follows conventional commits format
+- Notify team of significant changes
 
 ### Development Practices
 
@@ -85,11 +146,34 @@
 - Avoid deep nesting
 
 #### Naming Conventions
-- Files: kebab-case (e.g., `user-service.ts`)
-- Components: PascalCase (e.g., `UserProfile.tsx`)
-- Functions: camelCase (e.g., `getUserById`)
-- Constants: UPPER_SNAKE_CASE (e.g., `API_BASE_URL`)
-- Database tables: snake_case (e.g., `user_profiles`)
+
+**JavaScript/TypeScript:**
+- Variables and functions: camelCase (e.g., `getUserById`, `productName`, `isLoading`)
+- Constants: UPPER_SNAKE_CASE (e.g., `API_BASE_URL`, `MAX_PRODUCTS`)
+- Classes: PascalCase (e.g., `UserService`, `ProductManager`)
+
+**React Components:**
+- Component files: PascalCase (e.g., `UserProfile.tsx`, `SearchBar.tsx`)
+- Component names: PascalCase (e.g., `UserProfile`, `SearchBar`)
+- Props interface: PascalCase with "Props" suffix (e.g., `UserProfileProps`)
+
+**File Names:**
+- All files: kebab-case (e.g., `user-service.ts`, `product-search.tsx`)
+- Test files: kebab-case with `.test` or `.spec` suffix (e.g., `user-service.test.ts`)
+- Utility files: kebab-case (e.g., `api-client.ts`, `date-utils.ts`)
+
+**Database:**
+- Tables: snake_case (e.g., `user_profiles`, `product_nutrition`)
+- Columns: snake_case (e.g., `created_at`, `user_id`)
+- Indexes: snake_case with `idx_` prefix (e.g., `idx_user_email`)
+
+**API Endpoints:**
+- Routes: kebab-case (e.g., `/api/product-search`, `/api/priority-config`)
+- Query parameters: camelCase (e.g., `sortBy`, `filterBy`)
+
+**CSS/Styles:**
+- Classes: kebab-case (e.g., `.search-bar`, `.priority-slider`)
+- CSS variables: kebab-case with `--` prefix (e.g., `--primary-color`)
 
 ### API Design
 
@@ -213,10 +297,11 @@
 ### Tooling
 
 #### Required Tools
-- Node.js (specific version)
+- Node.js (v18 or higher)
 - Git
 - IDE (VS Code recommended)
 - Supabase CLI
+- Vite (for frontend build)
 - Docker (optional)
 
 #### Recommended Extensions
@@ -225,6 +310,7 @@
 - GitLens
 - Supabase extension
 - Database client (TablePlus, DBeaver)
+- PWA tools (Lighthouse, PWA Builder)
 
 ### Issue Tracking
 
