@@ -1,3 +1,11 @@
 node_modules/
 .env
 .DS_Store
+dist/
+build/
+*.log
+coverage/
+.nyc_output/
+.cache/
+.vscode/
+.idea/
