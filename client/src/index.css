@@ -15,20 +15,822 @@
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
 
 .app {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: 2.5em;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+h2 {
+  font-size: 1.8em;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+h3 {
+  font-size: 1.2em;
+  margin-bottom: 0.5rem;
+}
+
+button {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.back-button {
+  background: #666;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+/* Search Page */
+.search-page {
+  text-align: center;
+}
+
+.search-container {
+  margin: 2rem 0;
+}
+
+.search-form {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-input-wrapper {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search-input {
+  flex: 1;
+  padding: 1rem;
+  font-size: 1.1rem;
+  border: 2px solid #444;
+  border-radius: 8px;
+  background: #333;
+  color: white;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.search-button {
+  padding: 1rem 2rem;
+  background: #4CAF50;
+  color: white;
+  font-weight: bold;
+}
+
+.search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 0 0 8px 8px;
+  z-index: 100;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  padding: 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #444;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: #444;
+}
+
+.dropdown-product-name {
+  font-weight: bold;
+  color: white;
+}
+
+.dropdown-product-brand {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.dropdown-empty {
+  padding: 1rem;
+  color: #aaa;
+  text-align: center;
+}
+
+.allergen-filters {
+  margin: 2rem 0;
+  text-align: left;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.allergen-filters h3 {
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.allergen-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.allergen-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: #ccc;
+}
+
+.allergen-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+
+.quick-links {
+  margin: 2rem 0;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.nav-link-button {
+  background: #2196F3;
+  color: white;
+  padding: 0.75rem 1.5rem;
+}
+
+.search-results {
+  margin-top: 3rem;
+  text-align: left;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.product-card {
+  background: #333;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+}
+
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.product-info {
+  padding: 1rem;
+}
+
+.product-info h3 {
+  margin: 0 0 0.5rem 0;
+  color: #fff;
+}
+
+.product-brand {
+  color: #aaa;
+  font-size: 0.9rem;
+  margin: 0 0 0.25rem 0;
+}
+
+.product-category {
+  color: #666;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.allergen-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.allergen-badge {
+  background: #ff5722;
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+.allergen-badge.warning {
+  background: #ff9800;
+}
+
+/* Product Details Page */
+.product-details-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.product-details-container {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.product-detail-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.product-info-section h2 {
+  margin: 0 0 0.5rem 0;
+}
+
+.product-brand-detail {
+  color: #aaa;
+  font-size: 1.1rem;
+  margin: 0 0 0.25rem 0;
+}
+
+.product-category-detail {
+  color: #666;
+  margin: 0 0 1rem 0;
+}
+
+.allergen-section {
+  margin: 1rem 0;
+}
+
+.allergen-section h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.product-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.save-button {
+  background: #FFD700;
+  color: #333;
+  font-weight: bold;
+}
+
+.save-button.saved {
+  background: #4CAF50;
+  color: white;
+}
+
+.discover-button {
+  background: #2196F3;
+  color: white;
+}
+
+.compare-button {
+  background: #9C27B0;
+  color: white;
+}
+
+/* Nutrition Facts */
+.nutrition-section {
+  margin: 2rem 0;
+}
+
+.nutrition-facts-panel {
+  background: #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 400px;
+}
+
+.nutrition-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #444;
+}
+
+.nutrition-row:last-child {
+  border-bottom: none;
+}
+
+.nutrition-label {
+  font-weight: bold;
+  color: #fff;
+}
+
+.nutrition-value {
+  color: #ccc;
+}
+
+/* Ingredients */
+.ingredients-section {
+  margin: 2rem 0;
+}
+
+.ingredients-text {
+  background: #333;
+  padding: 1rem;
+  border-radius: 8px;
+  line-height: 1.6;
+  color: #ccc;
+}
+
+/* Alternatives Page */
+.alternatives-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.alternatives-subtitle {
+  color: #aaa;
+  margin-bottom: 2rem;
+}
+
+.alternatives-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.alternative-card {
+  display: flex;
+  gap: 1rem;
+  background: #333;
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.alternative-card:hover {
+  background: #3a3a3a;
+}
+
+.alternative-card.selected {
+  border-color: #4CAF50;
+  background: #2a2a2a;
+}
+
+.alternative-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.alternative-checkbox input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+}
+
+.alternative-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.alternative-info {
+  flex: 1;
+}
+
+.alternative-info h3 {
+  margin: 0 0 0.25rem 0;
+  color: #fff;
+}
+
+.alternative-brand {
+  color: #aaa;
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.alternative-nutrition {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.comparison-actions {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #333;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.comparison-actions p {
+  margin: 0 0 1rem 0;
+  color: #ccc;
+}
+
+.no-alternatives {
+  text-align: center;
+  padding: 2rem;
+  color: #aaa;
+}
+
+/* Priorities Page */
+.priorities-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.priorities-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.priority-factors-section,
+.allergen-exclusions-section {
+  background: #333;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.priority-factors-section h2,
+.allergen-exclusions-section h2 {
+  margin-top: 0;
+}
+
+.factor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.factor-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.factor-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: #fff;
+}
+
+.factor-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+
+.factor-label {
+  font-weight: 500;
+}
+
+.factor-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 2rem;
+}
+
+.factor-rating label {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.rating-input {
+  width: 60px;
+  padding: 0.5rem;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background: #222;
+  color: white;
+}
+
+.rating-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.error-message {
+  color: #ff5722;
+  font-size: 0.85rem;
+}
+
+.allergen-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.5rem;
+}
+
+.priority-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.reset-button {
+  background: #666;
+  color: white;
+}
+
+.save-button {
+  background: #4CAF50;
+  color: white;
+  font-weight: bold;
+}
+
+/* Comparison Page */
+.comparison-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow-x: auto;
+}
+
+.comparison-subtitle {
+  color: #aaa;
+  margin-bottom: 2rem;
+}
+
+.comparison-table-container {
+  overflow-x: auto;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #333;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 1rem;
+  border: 1px solid #444;
+  text-align: center;
+}
+
+.attribute-column {
+  background: #2a2a2a;
+  font-weight: bold;
+  color: #fff;
+  min-width: 120px;
+}
+
+.product-column {
+  background: #3a3a3a;
+  min-width: 200px;
+}
+
+.product-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.comparison-product-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.product-header-info h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #fff;
+}
+
+.product-header-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+.score-badge {
+  background: #4CAF50;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+.remove-product-button {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #ff5722;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.attribute-label {
+  background: #2a2a2a;
+  font-weight: bold;
+  color: #fff;
+  text-align: left;
+}
+
+.highlight-green {
+  background: #4CAF50 !important;
+  color: white;
+  font-weight: bold;
+}
+
+.no-allergens {
+  color: #4CAF50;
+  font-style: italic;
+}
+
+.comparison-legend {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #333;
+  border-radius: 8px;
+}
+
+.highlight-green-sample {
+  display: inline-block;
+  background: #4CAF50;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+}
+
+.comparison-actions {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.clear-button {
+  background: #ff5722;
+  color: white;
+}
+
+/* Saved Products Page */
+.saved-products-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.saved-subtitle {
+  color: #aaa;
+  margin-bottom: 2rem;
+}
+
+.saved-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.saved-product-card {
+  background: #333;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.saved-product-card:hover {
+  transform: translateY(-4px);
+}
+
+.saved-product-header {
+  position: relative;
+}
+
+.saved-product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.remove-saved-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #ff5722;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.saved-product-info {
+  padding: 1rem;
+}
+
+.saved-product-info h3 {
+  margin: 0 0 0.5rem 0;
+  color: #fff;
+}
+
+.saved-product-brand {
+  color: #aaa;
+  font-size: 0.9rem;
+  margin: 0 0 0.25rem 0;
+}
+
+.saved-product-category {
+  color: #666;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.no-saved-products {
+  text-align: center;
+  padding: 3rem;
+  color: #aaa;
+}
+
+.no-comparison {
+  text-align: center;
+  padding: 3rem;
+  color: #aaa;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .product-details-container {
+    grid-template-columns: 1fr;
+  }
+
+  .product-detail-image {
+    height: 200px;
+  }
+
+  .comparison-table {
+    font-size: 0.9rem;
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 0.5rem;
+  }
+
+  .product-header-info h3 {
+    font-size: 0.9rem;
+  }
 }
