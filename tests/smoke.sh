@@ -110,7 +110,7 @@ echo ""
 echo "--- Write Endpoints ---"
 
 # Test 7: Save a product (POST)
-test_post "/api/saved" '{"session_key":"test-session","product_id":"prod-1"}' 201
+test_post "/api/saved" '{"session_key":"smoke-test-$(date +%s)","product_id":"prod-1"}' 201
 
 # Test 8: Update preferences (PUT)
 test_put "/api/preferences" '{"priority_factors":[{"factor":"high_protein","importance":8,"rank":1}],"excluded_allergens":["soy"]}' 200
