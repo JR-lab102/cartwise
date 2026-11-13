@@ -34,47 +34,9 @@ CREATE TABLE IF NOT EXISTS user_preferences (
   excluded_allergens  TEXT[],
   updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
+  -- Ensure priority_factors is a JSON array
   CONSTRAINT chk_priority_factors_is_array
-    CHECK (jsonb_typeof(priority_factors) = 'array'),
-
-  CONSTRAINT chk_priority_factors_schema
-    CHECK (
-      -- Ensure every element has required keys with valid types
-      NOT EXISTS (
-        SELECT 1
-        FROM jsonb_array_elements(priority_factors) AS elem
-        WHERE NOT (
-          elem ? 'factor'
-          AND elem ? 'importance'
-          AND elem ? 'rank'
-          AND jsonb_typeof(elem -> 'factor') = 'string'
-          AND jsonb_typeof(elem -> 'importance') = 'number'
-          AND jsonb_typeof(elem -> 'rank') = 'number'
-        )
-      )
-    ),
-
-  CONSTRAINT chk_priority_factors_rating_range
-    CHECK (
-      -- Ensure importance ratings are integers between 1 and 10
-      NOT EXISTS (
-        SELECT 1
-        FROM jsonb_array_elements(priority_factors) AS elem
-        WHERE (elem ->> 'importance')::numeric NOT BETWEEN 1 AND 10
-           OR (elem ->> 'importance')::numeric <> floor((elem ->> 'importance')::numeric)
-      )
-    ),
-
-  CONSTRAINT chk_priority_factors_rank_positive
-    CHECK (
-      -- Ensure ranks are positive integers
-      NOT EXISTS (
-        SELECT 1
-        FROM jsonb_array_elements(priority_factors) AS elem
-        WHERE (elem ->> 'rank')::numeric <= 0
-           OR (elem ->> 'rank')::numeric <> floor((elem ->> 'rank')::numeric)
-      )
-    )
+    CHECK (jsonb_typeof(priority_factors) = 'array')
 );
 
 -- One preference row per session
