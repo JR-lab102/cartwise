@@ -1,38 +1,62 @@
-import { useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Product } from '../data/mockData'
 import { useApp } from '../context/AppContext'
+import { getProduct } from '../services/api'
 
 export default function ComparisonPage() {
   const navigate = useNavigate()
   const { comparisonProducts, preferences, removeFromComparison, clearComparison } = useApp()
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  // Fetch full product details for comparison
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true)
+      try {
+        const productPromises = comparisonProducts.map(p => getProduct(p.id))
+        const responses = await Promise.all(productPromises)
+        setProducts(responses.map(r => r.data))
+      } catch (err) {
+        console.error('Error fetching products:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (comparisonProducts.length > 0) {
+      fetchProducts()
+    } else {
+      setLoading(false)
+    }
+  }, [comparisonProducts])
 
   // Calculate scores based on priorities
   const scoredProducts = useMemo(() => {
-    return comparisonProducts.map(product => {
+    return products.map(product => {
       let totalScore = 0
       let maxPossibleScore = 0
 
       preferences.priorityFactors.forEach(pf => {
-        const weight = pf.importance / 10 // Normalize to 0-1
+        const weight = pf.importance / 10
         maxPossibleScore += weight
 
         let value = 0
         switch (pf.factor) {
           case 'high_protein':
-            value = product.proteinG / 20 // Normalize (assuming 20g is high)
+            value = product.proteinG / 20
             break
           case 'low_sugar':
-            value = 1 - (product.sugarG / 20) // Inverse (lower is better)
+            value = 1 - (product.sugarG / 20)
             break
           case 'low_calories':
-            value = 1 - (product.calories / 300) // Inverse
+            value = 1 - (product.calories / 300)
             break
           case 'high_fiber':
-            value = product.fiberG / 10 // Normalize
+            value = product.fiberG / 10
             break
           case 'low_sodium':
-            value = 1 - (product.sodiumMg / 300) // Inverse
+            value = 1 - (product.sodiumMg / 300)
             break
           case 'gluten_free':
             value = product.allergens.includes('gluten') ? 0 : 1
@@ -59,19 +83,17 @@ export default function ComparisonPage() {
       const normalizedScore = maxPossibleScore > 0 ? totalScore / maxPossibleScore : 0
       return { ...product, score: normalizedScore }
     })
-  }, [comparisonProducts, preferences.priorityFactors])
+  }, [products, preferences.priorityFactors])
 
   // Find best values for highlighting
   const bestValues = useMemo(() => {
     if (scoredProducts.length === 0) return {}
 
-    const attrs = ['calories', 'proteinG', 'sugarG', 'fiberG', 'sodiumMg'] as const
-    const best: Record<string, number> = {}
+    const attrs = ['calories', 'proteinG', 'sugarG', 'fiberG', 'sodiumMg']
+    const best = {}
 
     attrs.forEach(attr => {
       const values = scoredProducts.map(p => p[attr])
-      // For calories, sugar, sodium: lower is better
-      // For protein, fiber: higher is better
       if (['calories', 'sugarG', 'sodiumMg'].includes(attr)) {
         best[attr] = Math.min(...values)
       } else {
@@ -82,19 +104,25 @@ export default function ComparisonPage() {
     return best
   }, [scoredProducts])
 
-  const isBestValue = (_product: Product & { score: number }, attr: string, value: number) => {
-    const best = bestValues[attr as keyof typeof bestValues]
+  const isBestValue = (attr, value) => {
+    const best = bestValues[attr]
     if (best === undefined) return false
 
-    // For lower-is-better attributes
     if (['calories', 'sugarG', 'sodiumMg'].includes(attr)) {
       return value === best
     }
-    // For higher-is-better attributes
     return value === best
   }
 
-  if (comparisonProducts.length === 0) {
+  if (loading) {
+    return (
+      <div className="comparison-page">
+        <div className="loading">Loading comparison...</div>
+      </div>
+    )
+  }
+
+  if (comparisonProducts.length === 0 || products.length === 0) {
     return (
       <div className="comparison-page">
         <h1>Side-by-Side Product Comparison</h1>
@@ -160,7 +188,7 @@ export default function ComparisonPage() {
               {scoredProducts.map(product => (
                 <td
                   key={product.id}
-                  className={isBestValue(product, 'calories', product.calories) ? 'highlight-green' : ''}
+                  className={isBestValue('calories', product.calories) ? 'highlight-green' : ''}
                 >
                   {product.calories}
                 </td>
@@ -171,7 +199,7 @@ export default function ComparisonPage() {
               {scoredProducts.map(product => (
                 <td
                   key={product.id}
-                  className={isBestValue(product, 'proteinG', product.proteinG) ? 'highlight-green' : ''}
+                  className={isBestValue('proteinG', product.proteinG) ? 'highlight-green' : ''}
                 >
                   {product.proteinG}
                 </td>
@@ -182,7 +210,7 @@ export default function ComparisonPage() {
               {scoredProducts.map(product => (
                 <td
                   key={product.id}
-                  className={isBestValue(product, 'sugarG', product.sugarG) ? 'highlight-green' : ''}
+                  className={isBestValue('sugarG', product.sugarG) ? 'highlight-green' : ''}
                 >
                   {product.sugarG}
                 </td>
@@ -193,7 +221,7 @@ export default function ComparisonPage() {
               {scoredProducts.map(product => (
                 <td
                   key={product.id}
-                  className={isBestValue(product, 'fiberG', product.fiberG) ? 'highlight-green' : ''}
+                  className={isBestValue('fiberG', product.fiberG) ? 'highlight-green' : ''}
                 >
                   {product.fiberG}
                 </td>
@@ -204,7 +232,7 @@ export default function ComparisonPage() {
               {scoredProducts.map(product => (
                 <td
                   key={product.id}
-                  className={isBestValue(product, 'sodiumMg', product.sodiumMg) ? 'highlight-green' : ''}
+                  className={isBestValue('sodiumMg', product.sodiumMg) ? 'highlight-green' : ''}
                 >
                   {product.sodiumMg}
                 </td>

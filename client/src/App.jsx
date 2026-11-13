@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { AppProvider } from './context/AppContext'
-import SearchPage from './pages/SearchPage'
-import ProductDetailsPage from './pages/ProductDetailsPage'
-import DiscoverAlternativesPage from './pages/DiscoverAlternativesPage'
-import PrioritiesPage from './pages/PrioritiesPage'
-import ComparisonPage from './pages/ComparisonPage'
-import SavedProductsPage from './pages/SavedProductsPage'
+import { AppProvider } from './context/AppContext.jsx'
+import SearchPage from './pages/SearchPage.jsx'
+import ProductDetailsPage from './pages/ProductDetailsPage.jsx'
+import DiscoverAlternativesPage from './pages/DiscoverAlternativesPage.jsx'
+import PrioritiesPage from './pages/PrioritiesPage.jsx'
+import ComparisonPage from './pages/ComparisonPage.jsx'
+import SavedProductsPage from './pages/SavedProductsPage.jsx'
 
 function App() {
   return (

@@ -1,59 +1,62 @@
-import React, { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PRODUCTS, ALLERGENS, Product } from '../data/mockData'
+import { ALLERGENS } from '../data/mockData'
 import { useApp } from '../context/AppContext'
+import { getProducts } from '../services/api'
 
 export default function SearchPage() {
   const navigate = useNavigate()
   const { preferences } = useApp()
   const [searchQuery, setSearchQuery] = useState('')
   const [showDropdown, setShowDropdown] = useState(false)
-  const [selectedAllergensLocal, setSelectedAllergensLocal] = useState<string[]>([])
+  const [selectedAllergensLocal, setSelectedAllergensLocal] = useState([])
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
-  // Filter products based on search query and allergen exclusions
-  const filteredProducts = useMemo(() => {
-    let results = PRODUCTS
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const excludeAllergens = [
+          ...preferences.excludedAllergens,
+          ...selectedAllergensLocal
+        ];
+        const response = await getProducts({
+          q: searchQuery || undefined,
+          excludeAllergens: excludeAllergens.length > 0 ? excludeAllergens.join(',') : undefined
+        });
+        setProducts(response.data || []);
+      } catch (err) {
+        setError(err.message);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // Filter by search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
-      results = results.filter(
-        p =>
-          p.name.toLowerCase().includes(query) ||
-          p.brand.toLowerCase().includes(query) ||
-          p.category.toLowerCase().includes(query)
-      )
-    }
+    // Debounce search
+    const timeoutId = setTimeout(fetchProducts, 300);
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, preferences.excludedAllergens, selectedAllergensLocal]);
 
-    // Filter by excluded allergens
-    const excludedAllergens = [...preferences.excludedAllergens, ...selectedAllergensLocal]
-    if (excludedAllergens.length > 0) {
-      results = results.filter(p => {
-        return !p.allergens.some(allergen =>
-          excludedAllergens.includes(allergen.toLowerCase())
-        )
-      })
-    }
-
-    return results
-  }, [searchQuery, preferences.excludedAllergens, selectedAllergensLocal])
-
-  // Show dropdown with recommendations when typing
   const showRecommendations = showDropdown && searchQuery.trim().length > 0
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e) => {
     e.preventDefault()
-    if (filteredProducts.length > 0) {
-      navigate(`/product/${filteredProducts[0].id}`)
+    if (products.length > 0) {
+      navigate(`/product/${products[0].id}`)
     }
   }
 
-  const handleProductClick = (product: Product) => {
+  const handleProductClick = (product) => {
     navigate(`/product/${product.id}`)
     setShowDropdown(false)
   }
 
-  const toggleAllergen = (allergen: string) => {
+  const toggleAllergen = (allergen) => {
     setSelectedAllergensLocal(prev =>
       prev.includes(allergen)
         ? prev.filter(a => a !== allergen)
@@ -85,9 +88,12 @@ export default function SearchPage() {
             </button>
           </div>
 
-          {showRecommendations && (
+          {loading && <div className="loading">Searching...</div>}
+          {error && <div className="error">{error}</div>}
+
+          {showRecommendations && !loading && (
             <div className="search-dropdown">
-              {filteredProducts.slice(0, 5).map(product => (
+              {products.slice(0, 5).map(product => (
                 <div
                   key={product.id}
                   className="dropdown-item"
@@ -97,7 +103,7 @@ export default function SearchPage() {
                   <div className="dropdown-product-brand">{product.brand}</div>
                 </div>
               ))}
-              {filteredProducts.length === 0 && (
+              {products.length === 0 && (
                 <div className="dropdown-empty">No products found</div>
               )}
             </div>
@@ -136,11 +142,11 @@ export default function SearchPage() {
         </button>
       </div>
 
-      {searchQuery && filteredProducts.length > 0 && (
+      {searchQuery && products.length > 0 && !loading && (
         <div className="search-results">
-          <h2>Search Results ({filteredProducts.length})</h2>
+          <h2>Search Results ({products.length})</h2>
           <div className="product-grid">
-            {filteredProducts.map(product => (
+            {products.map(product => (
               <div
                 key={product.id}
                 className="product-card"

@@ -1,21 +1,76 @@
-import React from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
+import { getSavedProducts, getProduct, unsaveProduct } from '../services/api'
 
 export default function SavedProductsPage() {
   const navigate = useNavigate()
-  const { savedProducts, toggleSavedProduct } = useApp()
+  const { toggleSavedProduct } = useApp()
+  const [savedProducts, setSavedProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const handleProductClick = (productId: string) => {
+  const sessionKey = 'session_anon_001' // In production, get from auth
+
+  useEffect(() => {
+    const fetchSavedProducts = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        // Get saved product IDs
+        const savedResponse = await getSavedProducts(sessionKey)
+        const savedIds = savedResponse.data.map(sp => sp.product_id)
+
+        // Fetch full product details for each saved product
+        const productPromises = savedIds.map(id => getProduct(id))
+        const productResponses = await Promise.all(productPromises)
+        setSavedProducts(productResponses.map(r => r.data))
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchSavedProducts()
+  }, [])
+
+  const handleProductClick = (productId) => {
     navigate(`/product/${productId}`)
   }
 
-  const handleRemove = (e: React.MouseEvent, productId: string) => {
+  const handleRemove = async (e, productId) => {
     e.stopPropagation()
-    const product = savedProducts.find(p => p.id === productId)
-    if (product) {
-      toggleSavedProduct(product)
+    try {
+      await unsaveProduct(sessionKey, productId)
+      setSavedProducts(prev => prev.filter(p => p.id !== productId))
+      const product = savedProducts.find(p => p.id === productId)
+      if (product) {
+        toggleSavedProduct(product)
+      }
+    } catch (err) {
+      console.error('Error removing saved product:', err)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="saved-products-page">
+        <div className="loading">Loading saved products...</div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="saved-products-page">
+        <h1>Saved Products</h1>
+        <div className="error">{error}</div>
+        <button onClick={() => navigate('/')} className="back-button">
+          Back to Search
+        </button>
+      </div>
+    )
   }
 
   return (

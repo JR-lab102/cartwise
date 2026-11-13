@@ -1,33 +1,48 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PRIORITY_FACTORS, ALLERGENS, UserPreferences, PriorityFactor } from '../data/mockData'
+import { PRIORITY_FACTORS, ALLERGENS } from '../data/mockData'
 import { useApp } from '../context/AppContext'
+import { getPreferences, updatePreferences } from '../services/api'
 
 export default function PrioritiesPage() {
   const navigate = useNavigate()
   const { preferences, setPreferences } = useApp()
 
-  const [selectedFactors, setSelectedFactors] = useState<Set<string>>(
-    new Set(preferences.priorityFactors.map(pf => pf.factor))
-  )
-  const [factorRatings, setFactorRatings] = useState<Record<string, number>>(
-    Object.fromEntries(preferences.priorityFactors.map(pf => [pf.factor, pf.importance]))
-  )
-  const [excludedAllergens, setExcludedAllergens] = useState<string[]>(
-    preferences.excludedAllergens
-  )
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [selectedFactors, setSelectedFactors] = useState(new Set())
+  const [factorRatings, setFactorRatings] = useState({})
+  const [excludedAllergens, setExcludedAllergens] = useState([])
+  const [errors, setErrors] = useState({})
+  const [loading, setLoading] = useState(true)
 
-  // Initialize ratings for all factors
+  // Load preferences from API on mount
   useEffect(() => {
-    const initialRatings: Record<string, number> = {}
-    PRIORITY_FACTORS.forEach(f => {
-      initialRatings[f.id] = factorRatings[f.id] || 5
-    })
-    setFactorRatings(initialRatings)
+    const loadPreferences = async () => {
+      try {
+        const response = await getPreferences()
+        const prefs = response.data
+
+        // Convert API format to local format
+        const factors = new Set()
+        const ratings = {}
+        prefs.priorityFactors?.forEach(pf => {
+          factors.add(pf.factor)
+          ratings[pf.factor] = pf.importance
+        })
+
+        setSelectedFactors(factors)
+        setFactorRatings(ratings)
+        setExcludedAllergens(prefs.excludedAllergens || [])
+      } catch (err) {
+        console.error('Error loading preferences:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadPreferences()
   }, [])
 
-  const toggleFactor = (factorId: string) => {
+  const toggleFactor = (factorId) => {
     setSelectedFactors(prev => {
       const newSet = new Set(prev)
       if (newSet.has(factorId)) {
@@ -37,12 +52,10 @@ export default function PrioritiesPage() {
       }
       return newSet
     })
-    // Clear error when toggling
     setErrors(prev => ({ ...prev, [factorId]: '' }))
   }
 
-  const updateRating = (factorId: string, value: number) => {
-    // Validate 1-10 bounds
+  const updateRating = (factorId, value) => {
     if (value < 1 || value > 10) {
       setErrors(prev => ({ ...prev, [factorId]: 'Rating must be between 1 and 10' }))
       return
@@ -51,7 +64,7 @@ export default function PrioritiesPage() {
     setErrors(prev => ({ ...prev, [factorId]: '' }))
   }
 
-  const toggleAllergen = (allergen: string) => {
+  const toggleAllergen = (allergen) => {
     setExcludedAllergens(prev =>
       prev.includes(allergen)
         ? prev.filter(a => a !== allergen)
@@ -59,9 +72,9 @@ export default function PrioritiesPage() {
     )
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Validate all selected factors have ratings 1-10
-    const newErrors: Record<string, string> = {}
+    const newErrors = {}
     selectedFactors.forEach(factorId => {
       const rating = factorRatings[factorId]
       if (rating === undefined || rating < 1 || rating > 10) {
@@ -75,23 +88,21 @@ export default function PrioritiesPage() {
     }
 
     // Create priority factors with tie-breaker ranks
-    // Group by rating, then assign ranks within each group
-    const factorsByRating = new Map<number, string[]>()
+    const factorsByRating = new Map()
     selectedFactors.forEach(factorId => {
       const rating = factorRatings[factorId]
       if (!factorsByRating.has(rating)) {
         factorsByRating.set(rating, [])
       }
-      factorsByRating.get(rating)!.push(factorId)
+      factorsByRating.get(rating).push(factorId)
     })
 
-    const priorityFactors: PriorityFactor[] = []
+    const priorityFactors = []
     let rank = 1
-    // Sort ratings descending (higher importance = lower rank number)
     const sortedRatings = Array.from(factorsByRating.keys()).sort((a, b) => b - a)
 
     sortedRatings.forEach(rating => {
-      const factors = factorsByRating.get(rating)!
+      const factors = factorsByRating.get(rating)
       factors.forEach(factorId => {
         priorityFactors.push({
           factor: factorId,
@@ -101,13 +112,19 @@ export default function PrioritiesPage() {
       })
     })
 
-    const newPreferences: UserPreferences = {
+    const newPreferences = {
       priorityFactors,
       excludedAllergens
     }
 
-    setPreferences(newPreferences)
-    navigate('/')
+    try {
+      await updatePreferences(newPreferences)
+      setPreferences(newPreferences)
+      navigate('/')
+    } catch (err) {
+      console.error('Error saving preferences:', err)
+      alert('Failed to save preferences. Please try again.')
+    }
   }
 
   const handleReset = () => {
@@ -115,6 +132,14 @@ export default function PrioritiesPage() {
     setFactorRatings({})
     setExcludedAllergens([])
     setErrors({})
+  }
+
+  if (loading) {
+    return (
+      <div className="priorities-page">
+        <div className="loading">Loading preferences...</div>
+      </div>
+    )
   }
 
   return (

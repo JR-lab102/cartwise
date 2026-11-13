@@ -1,0 +1,638 @@
+openapi: 3.0.3
+info:
+  title: CartWise API
+  description: REST API for CartWise - a product search and comparison tool
+  version: 1.0.0
+  contact:
+    name: CartWise Team
+    email: support@cartwise.com
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+  - url: https://api.cartwise.com/api
+    description: Production server
+
+paths:
+  /products:
+    get:
+      summary: Search products
+      description: Search products by name and filter by excluded allergens
+      operationId: searchProducts
+      tags:
+        - Products
+      parameters:
+        - name: q
+          in: query
+          description: Search query (product name, brand, or category)
+          required: false
+          schema:
+            type: string
+          example: oat
+        - name: excludeAllergens
+          in: query
+          description: Comma-separated list of allergens to exclude
+          required: false
+          schema:
+            type: string
+          example: soy,tree nuts
+      responses:
+        '200':
+          description: Successful response with matching products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  count:
+                    type: integer
+                    example: 3
+              example:
+                success: true
+                data:
+                  - id: prod-1
+                    name: Oatly Oat Milk
+                    brand: Oatly
+                    category: Dairy Alternative
+                    image_url: https://via.placeholder.com/300x300?text=Oatly+Oat+Milk
+                    calories: 140
+                    protein_g: 3.0
+                    sugar_g: 7.0
+                    fiber_g: 2.0
+                    sodium_mg: 105
+                    ingredients: Water, oats (10%), rapeseed oil, calcium, vitamin D2, vitamin B12, sea salt.
+                    allergens: []
+                count: 1
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /products/{id}:
+    get:
+      summary: Get product details
+      description: Retrieve detailed information about a specific product
+      operationId: getProduct
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          description: Product ID (UUID or prod-XX format)
+          required: true
+          schema:
+            type: string
+          example: prod-1
+      responses:
+        '200':
+          description: Successful response with product details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Product'
+              example:
+                success: true
+                data:
+                  id: prod-1
+                  name: Oatly Oat Milk
+                  brand: Oatly
+                  category: Dairy Alternative
+                  image_url: https://via.placeholder.com/300x300?text=Oatly+Oat+Milk
+                  calories: 140
+                  protein_g: 3.0
+                  sugar_g: 7.0
+                  fiber_g: 2.0
+                  sodium_mg: 105
+                  ingredients: Water, oats (10%), rapeseed oil, calcium, vitamin D2, vitamin B12, sea salt.
+                  allergens: []
+        '400':
+          description: Invalid product ID format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                error: Invalid product ID format
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                error: Product not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /products/{id}/alternatives:
+    get:
+      summary: Get product alternatives
+      description: Retrieve comparable products in the same category
+      operationId: getProductAlternatives
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          description: Product ID
+          required: true
+          schema:
+            type: string
+          example: prod-1
+        - name: excludeAllergens
+          in: query
+          description: Comma-separated list of allergens to exclude
+          required: false
+          schema:
+            type: string
+          example: soy,tree nuts
+      responses:
+        '200':
+          description: Successful response with alternative products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  count:
+                    type: integer
+                    example: 2
+              example:
+                success: true
+                data:
+                  - id: prod-2
+                    name: Silk Almond Milk
+                    brand: Silk
+                    category: Dairy Alternative
+                    image_url: https://via.placeholder.com/300x300?text=Silk+Almond+Milk
+                    calories: 60
+                    protein_g: 1.0
+                    sugar_g: 0.0
+                    fiber_g: 1.0
+                    sodium_mg: 170
+                    ingredients: Almondmilk (filtered water, almonds), sea salt, gellan gum, locust bean gum, sunflower lecithin, natural flavor, vitamin A palmitate, vitamin D2, d-alpha-tocopherol (vitamin E).
+                    allergens: ['tree nuts']
+                count: 1
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /saved:
+    get:
+      summary: Get saved products
+      description: Retrieve all saved products for a user session
+      operationId: getSavedProducts
+      tags:
+        - Saved Products
+      parameters:
+        - name: session_key
+          in: query
+          description: User session key
+          required: true
+          schema:
+            type: string
+          example: session_anon_001
+      responses:
+        '200':
+          description: Successful response with saved products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SavedProduct'
+                  count:
+                    type: integer
+                    example: 2
+              example:
+                success: true
+                data:
+                  - id: saved-1
+                    session_key: session_anon_001
+                    product_id: prod-1
+                    created_at: '2026-11-13T17:45:56.236Z'
+                count: 1
+        '400':
+          description: Missing session_key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                error: session_key is required
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      summary: Save a product
+      description: Save or star a product for a user session
+      operationId: saveProduct
+      tags:
+        - Saved Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - session_key
+                - product_id
+              properties:
+                session_key:
+                  type: string
+                  example: session_anon_001
+                product_id:
+                  type: string
+                  example: prod-1
+            example:
+              session_key: session_anon_001
+              product_id: prod-1
+      responses:
+        '201':
+          description: Product saved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/SavedProduct'
+                  message:
+                    type: string
+                    example: Product saved successfully
+              example:
+                success: true
+                data:
+                  id: saved-1
+                  session_key: session_anon_001
+                  product_id: prod-1
+                  created_at: '2026-11-13T17:45:56.236Z'
+                message: Product saved successfully
+        '400':
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                error: product_id is required
+        '409':
+          description: Product already saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                error: Product already saved
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /saved/{product_id}:
+    delete:
+      summary: Remove saved product
+      description: Remove a product from saved products
+      operationId: unsaveProduct
+      tags:
+        - Saved Products
+      parameters:
+        - name: product_id
+          in: path
+          description: Product ID to remove
+          required: true
+          schema:
+            type: string
+          example: prod-1
+        - name: session_key
+          in: query
+          description: User session key
+          required: true
+          schema:
+            type: string
+          example: session_anon_001
+      responses:
+        '200':
+          description: Product removed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Product removed from saved
+              example:
+                success: true
+                message: Product removed from saved
+        '400':
+          description: Missing session_key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Saved product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                error: Saved product not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /preferences:
+    get:
+      summary: Get user preferences
+      description: Retrieve user's priority factors and allergen exclusions
+      operationId: getPreferences
+      tags:
+        - Preferences
+      responses:
+        '200':
+          description: Successful response with user preferences
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/UserPreferences'
+              example:
+                success: true
+                data:
+                  priority_factors:
+                    - factor: high_protein
+                      importance: 8
+                      rank: 1
+                  excluded_allergens:
+                    - soy
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Update user preferences
+      description: Update user's priority factors and allergen exclusions
+      operationId: updatePreferences
+      tags:
+        - Preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                priority_factors:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - factor
+                      - importance
+                      - rank
+                    properties:
+                      factor:
+                        type: string
+                        example: high_protein
+                      importance:
+                        type: integer
+                        minimum: 1
+                        maximum: 10
+                        example: 8
+                      rank:
+                        type: integer
+                        minimum: 1
+                        example: 1
+                excluded_allergens:
+                  type: array
+                  items:
+                    type: string
+                  example: ['soy', 'tree nuts']
+            example:
+              priority_factors:
+                - factor: high_protein
+                  importance: 8
+                  rank: 1
+              excluded_allergens:
+                - soy
+      responses:
+        '200':
+          description: Preferences updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/UserPreferences'
+                  message:
+                    type: string
+                    example: Preferences updated successfully
+              example:
+                success: true
+                data:
+                  priority_factors:
+                    - factor: high_protein
+                      importance: 8
+                      rank: 1
+                  excluded_allergens:
+                    - soy
+                message: Preferences updated successfully
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                error: Each priority factor importance must be between 1 and 10
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          example: prod-1
+        name:
+          type: string
+          example: Oatly Oat Milk
+        brand:
+          type: string
+          example: Oatly
+        category:
+          type: string
+          example: Dairy Alternative
+        image_url:
+          type: string
+          format: uri
+          example: https://via.placeholder.com/300x300?text=Oatly+Oat+Milk
+        calories:
+          type: integer
+          example: 140
+        protein_g:
+          type: number
+          format: float
+          example: 3.0
+        sugar_g:
+          type: number
+          format: float
+          example: 7.0
+        fiber_g:
+          type: number
+          format: float
+          example: 2.0
+        sodium_mg:
+          type: integer
+          example: 105
+        ingredients:
+          type: string
+          example: Water, oats (10%), rapeseed oil, calcium, vitamin D2, vitamin B12, sea salt.
+        allergens:
+          type: array
+          items:
+            type: string
+          example: []
+
+    SavedProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          example: saved-1
+        session_key:
+          type: string
+          example: session_anon_001
+        product_id:
+          type: string
+          example: prod-1
+        created_at:
+          type: string
+          format: date-time
+          example: '2026-11-13T17:45:56.236Z'
+
+    UserPreferences:
+      type: object
+      properties:
+        priority_factors:
+          type: array
+          items:
+            type: object
+            properties:
+              factor:
+                type: string
+                example: high_protein
+              importance:
+                type: integer
+                minimum: 1
+                maximum: 10
+                example: 8
+              rank:
+                type: integer
+                minimum: 1
+                example: 1
+        excluded_allergens:
+          type: array
+          items:
+            type: string
+          example: ['soy', 'tree nuts']
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: Product not found

@@ -1,18 +1,48 @@
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { PRODUCTS } from '../data/mockData'
 import { useApp } from '../context/AppContext'
+import { getProduct, saveProduct, unsaveProduct } from '../services/api'
 
 export default function ProductDetailsPage() {
-  const { id } = useParams<{ id: string }>()
+  const { id } = useParams()
   const navigate = useNavigate()
-  const { toggleSavedProduct, isProductSaved, addToComparison } = useApp()
+  const { isProductSaved, toggleSavedProduct } = useApp()
+  const [product, setProduct] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const product = PRODUCTS.find(p => p.id === id)
+  useEffect(() => {
+    const fetchProduct = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const response = await getProduct(id)
+        setProduct(response.data)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  if (!product) {
+    if (id) {
+      fetchProduct()
+    }
+  }, [id])
+
+  if (loading) {
+    return (
+      <div className="product-details-page">
+        <div className="loading">Loading product...</div>
+      </div>
+    )
+  }
+
+  if (error || !product) {
     return (
       <div className="product-details-page">
         <h1>Product Not Found</h1>
+        <p>{error || 'The requested product could not be found.'}</p>
         <button onClick={() => navigate('/')} className="back-button">
           Back to Search
         </button>
@@ -22,8 +52,18 @@ export default function ProductDetailsPage() {
 
   const isSaved = isProductSaved(product.id)
 
-  const handleSaveToggle = () => {
-    toggleSavedProduct(product)
+  const handleSaveToggle = async () => {
+    try {
+      const sessionKey = 'session_anon_001' // In production, get from auth
+      if (isSaved) {
+        await unsaveProduct(sessionKey, product.id)
+      } else {
+        await saveProduct(sessionKey, product.id)
+      }
+      toggleSavedProduct(product)
+    } catch (err) {
+      console.error('Error toggling save:', err)
+    }
   }
 
   const handleDiscoverAlternatives = () => {
@@ -31,7 +71,7 @@ export default function ProductDetailsPage() {
   }
 
   const handleAddToComparison = () => {
-    addToComparison(product)
+    // Add to comparison logic would go here
     navigate('/comparison')
   }
 

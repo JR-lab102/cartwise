@@ -1,42 +1,58 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { PRODUCTS } from '../data/mockData'
 import { useApp } from '../context/AppContext'
+import { getProduct, getProductAlternatives } from '../services/api'
 
 export default function DiscoverAlternativesPage() {
-  const { id } = useParams<{ id: string }>()
+  const { id } = useParams()
   const navigate = useNavigate()
   const { preferences, addToComparison } = useApp()
-  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set())
+  const [currentProduct, setCurrentProduct] = useState(null)
+  const [alternatives, setAlternatives] = useState([])
+  const [selectedProducts, setSelectedProducts] = useState(new Set())
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const currentProduct = PRODUCTS.find(p => p.id === id)
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        // Fetch current product
+        const productResponse = await getProduct(id)
+        setCurrentProduct(productResponse.data)
 
-  // Find alternatives in same category, filtered by allergen exclusions
-  const alternatives = useMemo(() => {
-    if (!currentProduct) return []
-
-    const excludedAllergens = preferences.excludedAllergens.map(a => a.toLowerCase())
-
-    return PRODUCTS.filter(p => {
-      // Same category
-      if (p.category !== currentProduct.category) return false
-      // Not the current product
-      if (p.id === currentProduct.id) return false
-      // Filter out products with excluded allergens
-      if (excludedAllergens.length > 0) {
-        const hasExcludedAllergen = p.allergens.some(allergen =>
-          excludedAllergens.includes(allergen.toLowerCase())
-        )
-        if (hasExcludedAllergen) return false
+        // Fetch alternatives
+        const alternativesResponse = await getProductAlternatives(
+          id,
+          preferences.excludedAllergens
+        );
+        setAlternatives(alternativesResponse.data || []);
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
       }
-      return true
-    })
-  }, [currentProduct, preferences.excludedAllergens])
+    }
 
-  if (!currentProduct) {
+    if (id) {
+      fetchData()
+    }
+  }, [id, preferences.excludedAllergens])
+
+  if (loading) {
+    return (
+      <div className="alternatives-page">
+        <div className="loading">Loading alternatives...</div>
+      </div>
+    )
+  }
+
+  if (error || !currentProduct) {
     return (
       <div className="alternatives-page">
         <h1>Product Not Found</h1>
+        <p>{error || 'The requested product could not be found.'}</p>
         <button onClick={() => navigate('/')} className="back-button">
           Back to Search
         </button>
@@ -44,7 +60,7 @@ export default function DiscoverAlternativesPage() {
     )
   }
 
-  const toggleProductSelection = (productId: string) => {
+  const toggleProductSelection = (productId) => {
     setSelectedProducts(prev => {
       const newSet = new Set(prev)
       if (newSet.has(productId)) {
@@ -58,7 +74,7 @@ export default function DiscoverAlternativesPage() {
 
   const handleAddSelectedToComparison = () => {
     selectedProducts.forEach(productId => {
-      const product = PRODUCTS.find(p => p.id === productId)
+      const product = alternatives.find(p => p.id === productId)
       if (product) {
         addToComparison(product)
       }
@@ -66,7 +82,7 @@ export default function DiscoverAlternativesPage() {
     navigate('/comparison')
   }
 
-  const isSelected = (productId: string) => selectedProducts.has(productId)
+  const isSelected = (productId) => selectedProducts.has(productId)
   const canSelectMore = selectedProducts.size < 5
 
   return (
